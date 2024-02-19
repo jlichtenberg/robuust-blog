@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BlogController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -25,6 +26,8 @@ Route::group(['namespace' => 'App\Http\Controllers\Api'], function () {
     Route::group(['middleware' => ['auth:api']], function() {
 
         Route::get('/user', [UserController::class, 'get'])->name('api.user');
+
+        Route::post('/blog/create', [BlogController::class, 'create'])->name('api.blog.create');
 
     });
 });
