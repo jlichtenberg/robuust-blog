@@ -27,6 +27,8 @@ Route::group(['namespace' => 'App\Http\Controllers\Api'], function () {
 
         Route::get('/user', [UserController::class, 'get'])->name('api.user');
 
+        Route::get('/blogs', [BlogController::class, 'index'])->name('api.blogs');
+
         Route::post('/blog/create', [BlogController::class, 'create'])->name('api.blog.create');
 
     });

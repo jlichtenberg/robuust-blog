@@ -9,6 +9,44 @@ use Illuminate\Http\JsonResponse;
 
 class BlogController extends Controller
 {
+
+    /**
+     * Get all blogs.
+     * 
+     * @return JsonResponse
+     *
+     * @OA\Get(
+     *      path="/api/blogs",
+     *      summary="Get all blogs",
+     *      description="Returns a list of all blogs.",
+     *      tags={"Blogs"},
+     *      @OA\Response(response="200", description="A list of all blogs"),
+     *      @OA\Response(response="401", description="Unauthorized. Indicates that the user is not authenticated."),
+     *      @OA\Response(response="500", description="Internal server error. Indicates a server-side problem."),
+     *      @OA\Parameter(
+     *          name="Accept",
+     *          required="true",
+     *          in="header",
+     *          description="Accept header",
+     *          @OA\Schema(type="string", default="application/json")
+     *      )
+     * )
+     */
+    public function index(): JsonResponse
+    {
+        $blogs = Blog::all()->sortByDesc('created_at');
+
+        if ($blogs->isEmpty()) {
+            return response()->json([
+                'message' => 'Er zijn geen blogs gevonden.'
+            ], 200);
+        }
+
+        return response()->json([
+            'blogs' => $blogs
+        ], 200);
+    }
+
     /**
      * Create a new blog.
      * 
@@ -32,6 +70,7 @@ class BlogController extends Controller
      *      ),
      *      @OA\Response(response="201", description="Blog created successfully"),
      *      @OA\Response(response="400", description="Bad request. Indicates that the request body is invalid or incomplete."),
+     *      @OA\Response(response="401", description="Unauthorized. Indicates that the user is not authenticated."),
      *      @OA\Response(response="422", description="Unprocessable entity. Indicates that the request body is invalid or incomplete."),
      *      @OA\Response(response="500", description="Internal server error. Indicates a server-side problem."),
      *      @OA\Parameter(
@@ -58,4 +97,6 @@ class BlogController extends Controller
             'blog' => $blog
         ], 201);
     }
+
+    
 }
