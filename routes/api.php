@@ -31,5 +31,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Api'], function () {
 
         Route::post('/blog/create', [BlogController::class, 'create'])->name('api.blog.create');
 
+        Route::get('/blog/{id}', [BlogController::class, 'show'])->name('api.blog.show');
+
     });
 });

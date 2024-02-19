@@ -25,16 +25,23 @@ class BlogController extends Controller
      *      @OA\Response(response="500", description="Internal server error. Indicates a server-side problem."),
      *      @OA\Parameter(
      *          name="Accept",
-     *          required="true",
+     *          required=true,
      *          in="header",
      *          description="Accept header",
      *          @OA\Schema(type="string", default="application/json")
+     *      ),
+     *      @OA\Parameter(
+     *          name="Authentication",
+     *          required=true,
+     *          in="header",
+     *          description="Bearer token",
+     *          @OA\Schema(type="string", default="Bearer <token>")
      *      )
      * )
      */
     public function index(): JsonResponse
     {
-        $blogs = Blog::all()->sortByDesc('created_at');
+        $blogs = Blog::with('user')->orderByDesc('created_at')->get();
 
         if ($blogs->isEmpty()) {
             return response()->json([
@@ -75,10 +82,17 @@ class BlogController extends Controller
      *      @OA\Response(response="500", description="Internal server error. Indicates a server-side problem."),
      *      @OA\Parameter(
      *          name="Accept",
-     *          required="true",
+     *          required=true,
      *          in="header",
      *          description="Accept header",
      *          @OA\Schema(type="string", default="application/json")
+     *      ),
+     *      @OA\Parameter(
+     *          name="Authentication",
+     *          required=true,
+     *          in="header",
+     *          description="Bearer token",
+     *          @OA\Schema(type="string", default="Bearer <token>")
      *      )
      * )
      */
@@ -96,6 +110,59 @@ class BlogController extends Controller
             'message' => 'De blog is succesvol aangemaakt.',
             'blog' => $blog
         ], 201);
+    }
+
+    /**
+     * Get a blog by ID.
+     * 
+     * @param int $id
+     * @return JsonResponse
+     * 
+     * @OA\Get(
+     *     path="/api/blogs/{id}",
+     *      summary="Get a blog by ID",
+     *      description="Returns a blog with the provided ID.",
+     *      tags={"Blogs"},
+     *      @OA\Response(response="200", description="A blog with the provided ID"),
+     *      @OA\Response(response="404", description="Not found. Indicates that the blog with the provided ID was not found."),
+     *      @OA\Response(response="401", description="Unauthorized. Indicates that the user is not authenticated."),
+     *      @OA\Response(response="500", description="Internal server error. Indicates a server-side problem."),
+     *      @OA\Parameter(
+     *          name="id",
+     *          required=true,
+     *          in="path",
+     *          description="The ID of the blog",
+     *          @OA\Schema(type="integer")
+     *      ),
+     *       @OA\Parameter(
+     *          name="Accept",
+     *          required=true,
+     *          in="header",
+     *          description="Accept header",
+     *          @OA\Schema(type="string", default="application/json")
+     *      ),
+     *      @OA\Parameter(
+     *          name="Authentication",
+     *          required=true,
+     *          in="header",
+     *          description="Bearer token",
+     *          @OA\Schema(type="string", default="Bearer <token>")
+     *      )
+     * )
+     */
+    public function show($id): JsonResponse
+    {
+        $blog = Blog::where('id', $id)->with('user')->first();
+
+        if (!$blog) {
+            return response()->json([
+                'message' => 'Geen blog gevonden met dit ID'
+            ], 404);
+        }
+
+        return response()->json([
+            'blog' => $blog
+        ], 200);
     }
 
     
