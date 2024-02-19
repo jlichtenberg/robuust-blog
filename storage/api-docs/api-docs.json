@@ -154,16 +154,6 @@
                             "type": "string",
                             "default": "application/json"
                         }
-                    },
-                    {
-                        "name": "Authentication",
-                        "in": "header",
-                        "description": "Bearer token",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "default": "Bearer <token>"
-                        }
                     }
                 ],
                 "responses": {
@@ -176,15 +166,22 @@
                     "500": {
                         "description": "Internal server error. Indicates a server-side problem."
                     }
-                }
-            },
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/blog/create": {
             "post": {
                 "tags": [
                     "Blogs"
                 ],
                 "summary": "Create a new blog",
                 "description": "Creates a new blog with the provided title, image, and body.",
-                "operationId": "e3dc4217ddba995e32209a6b5fa5a946",
+                "operationId": "4ca9d6012ba5ccb3d6dfb0d95bcb0249",
                 "parameters": [
                     {
                         "name": "Accept",
@@ -194,16 +191,6 @@
                         "schema": {
                             "type": "string",
                             "default": "application/json"
-                        }
-                    },
-                    {
-                        "name": "Authentication",
-                        "in": "header",
-                        "description": "Bearer token",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "default": "Bearer <token>"
                         }
                     }
                 ],
@@ -257,17 +244,22 @@
                     "500": {
                         "description": "Internal server error. Indicates a server-side problem."
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
-        "/api/blogs/{id}": {
-            "get": {
+        "/api/blog/update/{id}": {
+            "put": {
                 "tags": [
                     "Blogs"
                 ],
-                "summary": "Get a blog by ID",
-                "description": "Returns a blog with the provided ID.",
-                "operationId": "a721b624ed6c79419c05d78a108b4d95",
+                "summary": "Update a blog by ID",
+                "description": "Updates a blog with the provided ID.",
+                "operationId": "817dcfded8d33b76b3ac5797b52c7981",
                 "parameters": [
                     {
                         "name": "id",
@@ -287,15 +279,95 @@
                             "type": "string",
                             "default": "application/json"
                         }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Blog information",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "image",
+                                    "body"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "description": "The title of the blog",
+                                        "type": "string",
+                                        "example": "My first blog"
+                                    },
+                                    "image": {
+                                        "description": "The image of the blog",
+                                        "type": "string",
+                                        "format": "url",
+                                        "example": "https://example.com/image.jpg"
+                                    },
+                                    "body": {
+                                        "description": "The body of the blog",
+                                        "type": "string",
+                                        "example": "This is the body of my first blog"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Blog updated successfully"
+                    },
+                    "400": {
+                        "description": "Bad request. Indicates that the request body is invalid or incomplete."
+                    },
+                    "401": {
+                        "description": "Unauthorized. Indicates that the user is not authenticated."
+                    },
+                    "404": {
+                        "description": "Not found. Indicates that the blog with the provided ID was not found."
+                    },
+                    "422": {
+                        "description": "Unprocessable entity. Indicates that the request body is invalid or incomplete."
+                    },
+                    "500": {
+                        "description": "Internal server error. Indicates a server-side problem."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/blog/{id}": {
+            "get": {
+                "tags": [
+                    "Blogs"
+                ],
+                "summary": "Get a blog by ID",
+                "description": "Returns a blog with the provided ID.",
+                "operationId": "92fdf5c0182582715d2439ee4f758be6",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The ID of the blog",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
                     },
                     {
-                        "name": "Authentication",
+                        "name": "Accept",
                         "in": "header",
-                        "description": "Bearer token",
+                        "description": "Accept header",
                         "required": true,
                         "schema": {
                             "type": "string",
-                            "default": "Bearer <token>"
+                            "default": "application/json"
                         }
                     }
                 ],
@@ -312,7 +384,21 @@
                     "500": {
                         "description": "Internal server error. Indicates a server-side problem."
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
             }
         }
     }
