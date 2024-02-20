@@ -9,7 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
@@ -64,14 +64,17 @@ class AdminController extends Controller
      */
     public function dashboard($month = null): View
     {
+        // Get the current month
         $currentMonthName = now()->format('F');
         $currentMonth = now()->startOfMonth();
+
+        // If a month is provided, use that month
         if($month) {
             $currentMonthName = $month;
             $currentMonth = Carbon::createFromFormat('F', $month)->startOfMonth();
         }
 
-        // i want returned the count of blogs and the count of users created from the month provided
+        // Get the user and blog count for the current month
         $userCount = User::whereYear('created_at', $currentMonth->year)
                  ->whereMonth('created_at', $currentMonth->month)
                  ->count();
@@ -80,6 +83,7 @@ class AdminController extends Controller
                  ->whereMonth('created_at', $currentMonth->month)
                  ->count();
         
+        // Get the blog count for the last 12 months
         $blogsYear = Blog::selectRaw('count(*) as count, monthname(created_at) as month')
             ->where('created_at', '>', now()->subMonths(12))
             ->groupBy('month')
@@ -91,12 +95,34 @@ class AdminController extends Controller
     /**
      * Show the blogs.
      * 
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Contracts\View\View
      */
-    public function blogs(): View
+    public function blogs(Request $request): View
     {
-        $blogs = Blog::all();
-        return view('admin.blogs', compact('blogs'));
+        $currentUser = null;
+        $currentDate = null;
+        $users = User::all();
+        $blogs = Blog::paginate(25);
+        if ($request) {
+            $query = Blog::query();
+            // Filter by user
+            if ($request->query('user')) {
+                $query->where('user_id', $request->query('user'));
+                $currentUser = User::where('id', $request->query('user'))->first();
+            }
+        
+            // Filter by created_at date
+            if ($request->query('date')) {
+                $query->whereDate('created_at', $request->query('date'));
+                $currentDate = $request->query('date');
+            }
+        
+            $blogs = $query->paginate(25);
+        }
+        
+    
+        return view('admin.blogs', compact('blogs', 'users', 'currentUser', 'currentDate'));
     }
 
     /**

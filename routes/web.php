@@ -25,6 +25,7 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     
     // Blog routes
     Route::get('blogs', [AdminController::class, 'blogs'])->name('admin.blogs');
+    
     Route::get('blog/{id}', [AdminController::class, 'showBlog'])->name('admin.blog.show');
 
     // user routes
